@@ -12,6 +12,9 @@ import traceback
 import math
 import re
 
+allow_requests = True
+from ytmusicapi import YTMusic
+
 import aiohttp
 import discord
 import colorlog
@@ -26,6 +29,7 @@ from discord.enums import ChannelType
 
 from . import exceptions
 from . import downloader
+
 
 from .playlist import Playlist
 from .player import MusicPlayer
@@ -128,6 +132,8 @@ class MusicBot(discord.Client):
         self.aiosession = aiohttp.ClientSession(
             loop=self.loop, headers={"User-Agent": self.http.user_agent}
         )
+
+        self.ytmusic = YTMusic('./config/headers_auth.json')
 
         self.spotify = None
         if self.config._spotify:
@@ -798,8 +804,8 @@ class MusicBot(discord.Client):
                     entry = player.current_entry
 
             if entry:
-                prefix = u"\u275A\u275A " if is_paused else ""
-
+                #prefix = u"\u275A\u275A " if is_paused else ""
+                prefix = "魂天神社DJ室："
                 name = u"{}{}".format(prefix, entry.title)[:128]
                 game = discord.Game(type=0, name=name)
         else:
@@ -2748,6 +2754,76 @@ class MusicBot(discord.Client):
                 ).format(self.config.command_prefix),
                 delete_after=30,
             )
+
+    async def cmd_radio(self, player, channel, message,author,permissions, limit=30 ):
+        """
+        Usage:
+            {command_prefix}radio [limit]
+
+        Displays the current song in chat.
+        """
+
+        if player.current_entry:
+
+            await self.safe_send_message(channel, "正在將自動推薦的{}首歌曲加入列隊".format(limit))
+
+            current_entry_url = player.current_entry.url
+            SEARCH_QUEUE_LIMIT = 100
+            search_key = 'v='
+            if search_key in current_entry_url:
+                current_entry_song_id = player.current_entry.url.split('v=')[1]
+                watch_playlist = self.ytmusic.get_watch_playlist(videoId=current_entry_song_id, limit=SEARCH_QUEUE_LIMIT)['tracks']
+                print(len(watch_playlist))
+
+                
+                out_str = "已將以下歌曲加入播放列隊中\n"
+                
+                if limit > SEARCH_QUEUE_LIMIT:
+                    limit = SEARCH_QUEUE_LIMIT
+                for song in watch_playlist[1: limit+1]:
+                    song_id = song['title']
+                    song_len = song['length']
+                    if(len(song_len) > 4):
+                        await self.safe_send_message(channel, "{}這首歌太長了({})!跳過".format(song_id,song_len))
+                        continue
+
+                    out_str += (song_id+"\n")
+                    try:
+                        await self._cmd_play(
+                            message=message,
+                            _player=player,
+                            channel=channel,
+                            author=author,
+                            permissions=permissions,
+                            song_url=song_id,
+                            leftover_args=(),
+                            head=False,)
+                    except Exception as e:
+                        logging.error(traceback.format_exc())
+
+                return Response(out_str,delete_after=60)
+
+
+            else:
+                print(current_entry_url)
+                return Response(
+                    
+                    "目前播放的不是歌曲 無法創造Radio清單",
+                    delete_after=30,
+                )
+
+
+            
+
+        else:
+            return Response(
+                self.str.get(
+                    "cmd-np-none",
+                    "There are no songs queued! Queue something with {0}play.",
+                ).format(self.config.command_prefix),
+                delete_after=30,
+            )
+
 
     async def cmd_summon(self, channel, guild, author, voice_channel):
         """

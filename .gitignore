@@ -2,6 +2,7 @@
 *.pyc
 ~*/
 .vscode/
+.env/
 
 audio_cache/
 dectalk/
@@ -16,5 +17,7 @@ config/autoplaylist.txt
 config/autoplaylist_removed.txt
 config/whitelist.txt
 config/blacklist.txt
+config/ytmusic_header.json
+config/headers_auth.json
 
 docker-compose.yml

@@ -50,8 +50,8 @@
     "cmd-search-result": "結果 {0}/{1}： {2}",
     "cmd-search-accept": "好的，馬上就好！",
     "cmd-search-decline": "好吧 :(",
-    "cmd-np-action-streaming": "串流中",
-    "cmd-np-action-playing": "播放中",
+    "cmd-np-action-streaming": "直播",
+    "cmd-np-action-playing": "音樂",
     "cmd-np-reply-author": "現在播放 {action}： **{title}** ，由 **{author}** 點播\n進度： {progress_bar} {progress}\n:point_right: <{url}>",
     "cmd-np-reply-noauthor": "現在播放 {action}： **{title}**\n進度： {progress_bar} {progress}\n:point_right: <{url}>",
     "cmd-np-none": "沒有歌可以放了！ 用 {0}play 新增歌曲。",
@@ -88,7 +88,7 @@
     "cmd-volume-unreasonable-absolute": "提供了不合理的音量: {}%. 提供一個在 1 至 100之間的數值。",
     "cmd-option-autoplaylist-enabled": "自動播放清單已經啟用！",
     "cmd-option-autoplaylist-disabled": "自動播放清單已經禁用！",
-    "cmd-option-autoplaylist-none": "自動撥放清單的文件中沒有項目。",
+    "cmd-option-autoplaylist-none": "自動播放清單的文件中沒有項目。",
     "cmd-option-invalid-value": "提供了無效的值。",
     "cmd-option-invalid-param": "提供的參數無效。",
     "cmd-queue-more": "\n... 以及 %s 等等",
@@ -103,5 +103,7 @@
     "playlists-big": "播放清單包含太多項目 ({0} > {1})",
     "playlists-limit": "撥放清單項目 + 已經新增的歌曲，已超過上限值  ({0} + {1} > {2})",
     "karaoke-enabled": "卡拉OK模式已啟用，請在此模式禁用時再試一次！",
-    "left-no-owner-guilds": "因為沒有找到機器人的擁有者所以留下了 `{}`。"
+    "left-no-owner-guilds": "因為沒有找到機器人的擁有者所以留下了 `{}`。",
+    "on_player_play-onChannel": "正在頻道{channel}中播放: {author}所點播的{title}!",
+	"on_player_play-onChannel_noAuthor_autoplaylist": "正在{channel}中播放: 自動新增的{title}!"
 }
