@@ -2778,7 +2778,10 @@ class MusicBot(discord.Client):
                 limit = self.config.radio_default_limit
             else:
                 limit = int(limit)
-
+            if limit > SEARCH_QUEUE_LIMIT:
+                limit = SEARCH_QUEUE_LIMIT
+            
+            
             await delete_previous_msg("last_radio_msg")
             self.server_specific_data[guild][
                 "last_radio_msg"
@@ -2789,14 +2792,13 @@ class MusicBot(discord.Client):
             search_key = 'v='
             if search_key in current_entry_url:
                 current_entry_song_id = player.current_entry.url.split('v=')[1]
-                watch_playlist = self.ytmusic.get_watch_playlist(videoId=current_entry_song_id, limit=SEARCH_QUEUE_LIMIT)['tracks']
+                watch_playlist = self.ytmusic.get_watch_playlist(videoId=current_entry_song_id, limit=limit+1)['tracks']
                 print(len(watch_playlist))
 
                 
                 out_str = "已將以下歌曲加入播放列隊中\n"
                 
-                if limit > SEARCH_QUEUE_LIMIT:
-                    limit = SEARCH_QUEUE_LIMIT
+
 
                 
                 for song in watch_playlist[1: limit+1]:
@@ -3492,10 +3494,19 @@ class MusicBot(discord.Client):
                     "There are no songs queued! Queue something with {}play.",
                 ).format(self.config.command_prefix)
             )
-        
 
-        time_until = await player.playlist.estimate_time_until( len(player.playlist)-1, player)
-        lines.append("\n剩餘播放時間: `{}`".format(ftimedelta(time_until-timedelta(seconds=player.progress))))
+        if (len(player.playlist) >= 1):
+            try:
+                time_until = await player.playlist.estimate_time_until( len(player.playlist)+1, player)
+
+                # if player.current_entry.duration != None:
+                #     print("ETA:{}, current_entry duration:{}, player.progress:{}".format(time_until,timedelta(seconds=player.current_entry.duration), timedelta(seconds=player.progress)))
+                #     time_until += timedelta(seconds=player.current_entry.duration)
+                #     time_until -= timedelta(seconds=player.progress)
+
+                lines.append("\n剩餘播放時間: `{}`".format(ftimedelta(time_until)))
+            except Exception as e:
+                logging.error(traceback.format_exc())
 
 
         message = "\n".join(lines)
