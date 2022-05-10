@@ -4305,6 +4305,7 @@ class MusicBot(discord.Client):
                 if not any(
                     is_active(m) for m in player.voice_client.channel.members
                 ):  # channel is empty
+
                     if not auto_paused and player.is_playing:
                         log.info(
                             autopause_msg.format(
@@ -4354,6 +4355,7 @@ class MusicBot(discord.Client):
                     player.resume()
 
             else:
+
                 if not auto_paused and player.is_playing:
                     log.info(
                         autopause_msg.format(
@@ -4367,6 +4369,32 @@ class MusicBot(discord.Client):
                         "auto_paused"
                     ] = True
                     player.pause()
+
+                if self.config.auto_leave_channel:
+                    player.pause()
+                    # set timer and leave channel
+                    log.info("The channel is empty")
+                    auto_leave_timer = 0
+                    auto_leave_time_in_seconds  = self.config.auto_leave_time
+                    voice = player.voice_client
+                    while True:
+                        log.info("Timer: {}".format(auto_leave_timer))
+                        await asyncio.sleep(1)
+                        auto_leave_timer = auto_leave_timer + 1
+                        if voice.is_playing() and not voice.is_paused():
+                            auto_leave_timer = 0
+                            break
+                        if auto_leave_timer == auto_leave_time_in_seconds:
+
+                            await self.disconnect_voice_client(channel.guild)
+
+                            log.info("Disconnected caused empty channel from Guild: {}".format(channel.guild,))
+                        if not voice.is_connected():
+                            break
+
+
+
+
 
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         if before.region != after.region:

@@ -108,9 +108,22 @@ class Config:
         self.auto_summon = config.getboolean(
             "MusicBot", "AutoSummon", fallback=ConfigDefaults.auto_summon
         )
+
+        self.auto_leave_channel = config.getboolean(
+            "MusicBot", "AutoLeaveChannel", fallback=ConfigDefaults.auto_leave_channel
+        )
+
+        self.auto_leave_time = config.getint(
+            "MusicBot", "AutoLeaveTime", fallback=ConfigDefaults.auto_leave_time
+        )
+
         self.auto_playlist = config.getboolean(
             "MusicBot", "UseAutoPlaylist", fallback=ConfigDefaults.auto_playlist
         )
+        self.auto_playlist = config.getboolean(
+            "MusicBot", "AutoLeaveChannel", fallback=ConfigDefaults.auto_playlist
+        )
+
         self.auto_playlist_random = config.getboolean(
             "MusicBot",
             "AutoPlaylistRandom",
@@ -491,6 +504,8 @@ class ConfigDefaults:
     save_videos = True
     now_playing_mentions = False
     auto_summon = True
+    auto_leave_channel = False
+    auto_leave_time = 60
     auto_playlist = True
     auto_playlist_random = True
     auto_pause = True
