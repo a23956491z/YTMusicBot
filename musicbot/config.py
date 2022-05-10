@@ -117,6 +117,9 @@ class Config:
             "MusicBot", "AutoLeaveTime", fallback=ConfigDefaults.auto_leave_time
         )
 
+        self.radio_default_limit = config.getint(
+            "MusicBot", "RadioDefaultLimit", fallback=ConfigDefaults.radio_default_limit
+        )
         self.auto_playlist = config.getboolean(
             "MusicBot", "UseAutoPlaylist", fallback=ConfigDefaults.auto_playlist
         )
@@ -506,6 +509,7 @@ class ConfigDefaults:
     auto_summon = True
     auto_leave_channel = False
     auto_leave_time = 60
+    radio_default_limit=5
     auto_playlist = True
     auto_playlist_random = True
     auto_pause = True

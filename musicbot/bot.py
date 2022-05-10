@@ -2756,7 +2756,7 @@ class MusicBot(discord.Client):
                 delete_after=30,
             )
 
-    async def cmd_radio(self, player, channel, guild,message ,author,permissions, limit=30 ):
+    async def cmd_radio(self, player, channel, guild,message ,author,permissions, limit=None ):
         """
         Usage:
             {command_prefix}radio [limit]
@@ -2773,15 +2773,19 @@ class MusicBot(discord.Client):
 
 
         if player.current_entry:
-            
+            SEARCH_QUEUE_LIMIT = 100
+            if limit == None:
+                limit = self.config.radio_default_limit
+            else:
+                limit = int(limit)
+
             await delete_previous_msg("last_radio_msg")
             self.server_specific_data[guild][
                 "last_radio_msg"
             ] = await self.safe_send_message(channel, "正在將自動推薦的{}首歌曲加入列隊".format(limit))
 
             current_entry_url = player.current_entry.url
-            SEARCH_QUEUE_LIMIT = 100
-            limit = int(limit)
+
             search_key = 'v='
             if search_key in current_entry_url:
                 current_entry_song_id = player.current_entry.url.split('v=')[1]
@@ -2802,7 +2806,7 @@ class MusicBot(discord.Client):
                         # await self.safe_send_message(channel, "{}這首歌太長了({})!跳過".format(song_id,song_len))
                         continue
 
-                    out_str += (song_id+"\n")
+                    out_str += ("{} ({})\n".format(song_id, song_len))
                     try:
                         await self._cmd_play(
                             message=message,
@@ -3488,6 +3492,11 @@ class MusicBot(discord.Client):
                     "There are no songs queued! Queue something with {}play.",
                 ).format(self.config.command_prefix)
             )
+        
+
+        time_until = await player.playlist.estimate_time_until( len(player.playlist)-1, player)
+        lines.append("\n剩餘播放時間: `{}`".format(ftimedelta(time_until-timedelta(seconds=player.progress))))
+
 
         message = "\n".join(lines)
         return Response(message, delete_after=30)
@@ -4378,7 +4387,7 @@ class MusicBot(discord.Client):
                     auto_leave_time_in_seconds  = self.config.auto_leave_time
                     voice = player.voice_client
                     while True:
-                        log.info("Timer: {}".format(auto_leave_timer))
+                        # log.info("Timer: {}".format(auto_leave_timer))
                         await asyncio.sleep(1)
                         auto_leave_timer = auto_leave_timer + 1
                         if voice.is_playing() and not voice.is_paused():
