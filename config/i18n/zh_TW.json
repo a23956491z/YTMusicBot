@@ -91,7 +91,7 @@
     "cmd-option-autoplaylist-none": "自動播放清單的文件中沒有項目。",
     "cmd-option-invalid-value": "提供了無效的值。",
     "cmd-option-invalid-param": "提供的參數無效。",
-    "cmd-queue-more": "\n... 以及 %s 等等",
+    "cmd-queue-more": "\n... 以及其餘的 %s 首歌",
     "cmd-queue-none": "沒有歌可以放了！ 用 {0}play 新增歌曲。",
     "cmd-queue-playing-author": "現在播放：`{0}` 由 `{1}` 點播 {2}\n",
     "cmd-queue-playing-noauthor": "現在播放： `{0}` {1}\n",
