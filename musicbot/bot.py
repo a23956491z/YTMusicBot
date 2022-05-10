@@ -124,6 +124,7 @@ class MusicBot(discord.Client):
             "last_np_msg": None,
             "auto_paused": False,
             "availability_paused": False,
+            "last_radio_msg" : None,
         }
         self.server_specific_data = defaultdict(ssd_defaults.copy)
 
@@ -2755,7 +2756,7 @@ class MusicBot(discord.Client):
                 delete_after=30,
             )
 
-    async def cmd_radio(self, player, channel, message,author,permissions, limit=30 ):
+    async def cmd_radio(self, player, channel, guild,message ,author,permissions, limit=30 ):
         """
         Usage:
             {command_prefix}radio [limit]
@@ -2763,12 +2764,24 @@ class MusicBot(discord.Client):
         Displays the current song in chat.
         """
 
-        if player.current_entry:
+        async def delete_previous_msg(key):
+            if self.server_specific_data[guild][key]:
+                await self.safe_delete_message(
+                    self.server_specific_data[guild][key]
+                )
+                self.server_specific_data[guild][key] = None
 
-            await self.safe_send_message(channel, "正在將自動推薦的{}首歌曲加入列隊".format(limit))
+
+        if player.current_entry:
+            
+            await delete_previous_msg("last_radio_msg")
+            self.server_specific_data[guild][
+                "last_radio_msg"
+            ] = await self.safe_send_message(channel, "正在將自動推薦的{}首歌曲加入列隊".format(limit))
 
             current_entry_url = player.current_entry.url
             SEARCH_QUEUE_LIMIT = 100
+            limit = int(limit)
             search_key = 'v='
             if search_key in current_entry_url:
                 current_entry_song_id = player.current_entry.url.split('v=')[1]
@@ -2780,11 +2793,13 @@ class MusicBot(discord.Client):
                 
                 if limit > SEARCH_QUEUE_LIMIT:
                     limit = SEARCH_QUEUE_LIMIT
+
+                
                 for song in watch_playlist[1: limit+1]:
                     song_id = song['title']
                     song_len = song['length']
                     if(len(song_len) > 4):
-                        await self.safe_send_message(channel, "{}這首歌太長了({})!跳過".format(song_id,song_len))
+                        # await self.safe_send_message(channel, "{}這首歌太長了({})!跳過".format(song_id,song_len))
                         continue
 
                     out_str += (song_id+"\n")
@@ -2801,6 +2816,7 @@ class MusicBot(discord.Client):
                     except Exception as e:
                         logging.error(traceback.format_exc())
 
+                await delete_previous_msg("last_radio_msg")
                 return Response(out_str,delete_after=60)
 
 
